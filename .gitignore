@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+.venv/
+venv/
+env/
+
+# Data pipeline (raw cache only — docs/data/ is committed for frontend)
+atlas.db
+/data/
+!docs/data/
+*.parquet
+*.dbc
+*.dbf
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# PySUS cache
+.pysus/
+
+# Node (for topojson CLI if used)
+node_modules/

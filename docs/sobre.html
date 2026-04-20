@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sobre — Atlas de Vulnerabilidade em Saúde</title>
+  <meta name="description" content="Sobre o Atlas de Vulnerabilidade em Saúde e o ICVS — um projeto de dados abertos para vigilância em saúde pública municipal no Brasil.">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="top-bar">
+    <div class="logo">
+      <div class="logo-icon">🏥</div>
+      <span>Atlas de Vulnerabilidade em Saúde</span>
+    </div>
+    <nav>
+      <a href="index.html">Mapa</a>
+      <a href="metodologia.html">Metodologia</a>
+      <a href="sobre.html" class="active">Sobre</a>
+    </nav>
+  </header>
+
+  <div class="content-page">
+    <div class="content-container">
+      <h1>Sobre o Projeto</h1>
+
+      <h2>O que é o ICVS?</h2>
+      <p>O <strong>ICVS — Índice Composto de Vulnerabilidade em Saúde</strong> é um atlas interativo que classifica os 5.570 municípios brasileiros por nível de vulnerabilidade em saúde. Ele integra dados de mortalidade, nascimentos, internações, infraestrutura e cobertura da atenção primária em um índice único, permitindo a identificação de territórios prioritários para políticas públicas de saúde.</p>
+
+      <h2>Por que este atlas?</h2>
+      <p>O Brasil possui uma enorme diversidade de condições de saúde entre seus municípios. Enquanto grandes centros urbanos concentram recursos, milhares de municípios pequenos enfrentam desafios como:</p>
+      <ul>
+        <li>Alta mortalidade infantil e materna</li>
+        <li>Escassez de médicos e leitos hospitalares</li>
+        <li>Baixa cobertura da Estratégia Saúde da Família</li>
+        <li>Taxas elevadas de internações por condições evitáveis</li>
+      </ul>
+      <p>O ICVS sintetiza essas dimensões em um índice comparável, transparente e replicável.</p>
+
+      <h2>Dados Abertos</h2>
+      <p>Este projeto utiliza <strong>exclusivamente dados públicos</strong>:</p>
+      <ul>
+        <li><strong>DATASUS</strong> — Sistemas SIM, SINASC, SIH, CNES (via pacote PySUS)</li>
+        <li><strong>e-Gestor APS</strong> — Cobertura da Atenção Primária</li>
+        <li><strong>IBGE</strong> — Estimativas populacionais e malha geográfica</li>
+      </ul>
+      <p>Todo o código-fonte está disponível no GitHub sob licença aberta. O pipeline de dados é executado mensalmente via GitHub Actions, garantindo atualização contínua.</p>
+
+      <h2>Stack Tecnológica</h2>
+      <table>
+        <thead>
+          <tr><th>Componente</th><th>Tecnologia</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Pipeline de dados</td><td>Python, PySUS, pandas, scikit-learn</td></tr>
+          <tr><td>Banco de dados</td><td>SQLite</td></tr>
+          <tr><td>Frontend</td><td>HTML, CSS, JavaScript (Vanilla)</td></tr>
+          <tr><td>Mapa interativo</td><td>Leaflet.js + TopoJSON</td></tr>
+          <tr><td>Gráficos</td><td>Chart.js</td></tr>
+          <tr><td>Hospedagem</td><td>Cloudflare Pages</td></tr>
+          <tr><td>CI/CD</td><td>GitHub Actions</td></tr>
+        </tbody>
+      </table>
+
+      <h2>Como Citar</h2>
+      <p>Se utilizar o ICVS em publicações acadêmicas ou relatórios, por favor cite:</p>
+      <div class="formula">
+        Atlas de Vulnerabilidade em Saúde dos Municípios Brasileiros (ICVS). 2024.<br>
+        Disponível em: https://atlas-saude-brasil.pages.dev
+      </div>
+
+      <h2>Contato</h2>
+      <p>Este é um projeto de código aberto. Contribuições, sugestões e correções são bem-vindas através do repositório no GitHub.</p>
+
+      <h2>Licença</h2>
+      <p>Código-fonte: <strong>MIT License</strong><br>
+      Dados: As fontes originais seguem as respectivas políticas de dados abertos do DATASUS e IBGE.</p>
+    </div>
+  </div>
+</body>
+</html>

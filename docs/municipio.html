@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Município — Atlas de Vulnerabilidade em Saúde</title>
+  <meta name="description" content="Perfil detalhado de vulnerabilidade em saúde do município, com série histórica, indicadores e comparativo regional.">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+  <!-- Loading -->
+  <div class="loading-overlay" id="loading">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Carregando dados do município...</div>
+  </div>
+
+  <!-- Header -->
+  <header class="top-bar">
+    <div class="logo">
+      <div class="logo-icon">🏥</div>
+      <span>Atlas de Vulnerabilidade em Saúde</span>
+    </div>
+    <nav>
+      <a href="index.html">Mapa</a>
+      <a href="metodologia.html">Metodologia</a>
+      <a href="sobre.html">Sobre</a>
+    </nav>
+  </header>
+
+  <!-- Content -->
+  <div class="detail-layout">
+    <div class="detail-container">
+
+      <a href="index.html" class="back-link">← Voltar ao mapa</a>
+
+      <!-- Municipality Header -->
+      <div class="mun-header" id="mun-header">
+        <div>
+          <h1 id="mun-name">—</h1>
+          <div class="mun-meta">
+            <span id="mun-uf"></span>
+            <span id="mun-regiao"></span>
+            <span id="mun-pop"></span>
+            <span id="mun-cluster"></span>
+          </div>
+        </div>
+        <div class="icvs-hero" id="icvs-hero">
+          <div class="score" id="icvs-score">—</div>
+          <div class="quintil-label" id="quintil-label">—</div>
+        </div>
+      </div>
+
+      <!-- Metric Cards -->
+      <div class="metric-grid" id="metric-grid">
+        <div class="metric-card">
+          <div class="metric-label">ICVS Composto</div>
+          <div class="metric-value" id="card-icvs">—</div>
+          <div class="metric-trend neutral" id="trend-icvs"></div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Desfechos em Saúde</div>
+          <div class="metric-value" id="card-desfechos">—</div>
+          <div class="metric-trend neutral" id="trend-desfechos"></div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Acesso e Capacidade</div>
+          <div class="metric-value" id="card-acesso">—</div>
+          <div class="metric-trend neutral" id="trend-acesso"></div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Qualidade da Atenção</div>
+          <div class="metric-value" id="card-qualidade">—</div>
+          <div class="metric-trend neutral" id="trend-qualidade"></div>
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div class="charts-row">
+        <div class="chart-panel">
+          <h3>Evolução do ICVS</h3>
+          <div style="height:300px">
+            <canvas id="chart-evolution"></canvas>
+          </div>
+        </div>
+        <div class="chart-panel">
+          <h3>Perfil de Vulnerabilidade</h3>
+          <div style="height:300px">
+            <canvas id="chart-radar"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Indicator Table -->
+      <div class="indicator-table-wrapper">
+        <h3>Indicadores Detalhados</h3>
+        <table class="indicator-table">
+          <thead>
+            <tr>
+              <th>Indicador</th>
+              <th>Valor Bruto</th>
+              <th>Valor Suavizado</th>
+              <th>Percentil Nacional</th>
+              <th style="min-width:120px">Posição</th>
+            </tr>
+          </thead>
+          <tbody id="indicator-tbody"></tbody>
+        </table>
+      </div>
+
+      <!-- Similar Municipalities -->
+      <div class="similar-section">
+        <h3>Municípios Similares (mesmo cluster)</h3>
+        <div class="similar-grid" id="similar-grid">
+          <!-- populated via JS -->
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="action-bar">
+        <button class="btn btn-primary" onclick="window.print()">
+          📄 Exportar PDF
+        </button>
+        <button class="btn" onclick="window.location.href='index.html'">
+          🗺️ Ver no Mapa
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <script src="assets/charts.js"></script>
+  <script src="assets/municipio.js"></script>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atlas de Vulnerabilidade em Saúde — Brasil</title>
+  <meta name="description" content="ICVS — Índice Composto de Vulnerabilidade em Saúde. Atlas interativo dos 5.570 municípios brasileiros com indicadores de mortalidade, acesso e qualidade da atenção em saúde.">
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin="anonymous"/>
+
+  <!-- App CSS -->
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loading">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Carregando atlas...</div>
+  </div>
+
+  <!-- Header -->
+  <header class="top-bar">
+    <div class="logo">
+      <div class="logo-icon">🏥</div>
+      <span>Atlas de Vulnerabilidade em Saúde</span>
+    </div>
+    <nav>
+      <a href="metodologia.html">Metodologia</a>
+      <a href="sobre.html">Sobre</a>
+    </nav>
+  </header>
+
+  <!-- Main Layout -->
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-toggle" id="sidebar-toggle"></div>
+
+      <!-- Search -->
+      <div class="control-group">
+        <label for="search-input">Buscar município</label>
+        <div class="search-wrapper">
+          <input type="text"
+                 id="search-input"
+                 placeholder="Digite o nome..."
+                 autocomplete="off">
+          <div class="search-results" id="search-results"></div>
+        </div>
+      </div>
+
+      <!-- Year -->
+      <div class="control-group">
+        <label for="year-select">Ano de referência</label>
+        <select id="year-select"></select>
+      </div>
+
+      <!-- Indicator -->
+      <div class="control-group">
+        <label for="indicator-select">Indicador</label>
+        <select id="indicator-select">
+          <option value="icvs">ICVS — Índice Composto</option>
+          <option value="sub_desfechos">Sub-índice: Desfechos</option>
+          <option value="sub_acesso">Sub-índice: Acesso</option>
+          <option value="sub_qualidade">Sub-índice: Qualidade</option>
+        </select>
+      </div>
+
+      <!-- UF Filter -->
+      <div class="control-group">
+        <label for="uf-select">Filtrar por UF</label>
+        <select id="uf-select">
+          <option value="">Todos os estados</option>
+        </select>
+      </div>
+
+      <!-- Summary Stats -->
+      <div class="summary-bar">
+        <div class="summary-card">
+          <div class="label">Municípios</div>
+          <div class="value" id="stat-count">—</div>
+        </div>
+        <div class="summary-card">
+          <div class="label">ICVS Médio</div>
+          <div class="value" id="stat-mean">—</div>
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div class="legend" id="legend">
+        <div class="legend-title">Vulnerabilidade</div>
+        <div class="legend-gradient"></div>
+        <div class="legend-labels">
+          <span>Muito Baixa</span>
+          <span>Baixa</span>
+          <span>Moderada</span>
+          <span>Alta</span>
+          <span>Muito Alta</span>
+        </div>
+      </div>
+
+      <!-- Top Municipalities -->
+      <div class="stats-panel" id="stats-panel">
+        <div class="stats-title">Top 10 mais vulneráveis</div>
+        <!-- populated via JS -->
+      </div>
+    </aside>
+
+    <!-- Map -->
+    <main class="map-container">
+      <div id="map"></div>
+      <div class="map-tooltip" id="tooltip" style="display:none"></div>
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+          integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+          crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>
