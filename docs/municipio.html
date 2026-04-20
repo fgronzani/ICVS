@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Município — Atlas de Vulnerabilidade em Saúde</title>
+  <title>Município — ICVS Atlas</title>
   <meta name="description" content="Perfil detalhado de vulnerabilidade em saúde do município, com série histórica, indicadores e comparativo regional.">
   <link rel="stylesheet" href="assets/style.css">
 </head>
@@ -12,14 +12,14 @@
   <!-- Loading -->
   <div class="loading-overlay" id="loading">
     <div class="loading-spinner"></div>
-    <div class="loading-text">Carregando dados do município...</div>
+    <div class="loading-text">Carregando perfil do município...</div>
   </div>
 
   <!-- Header -->
   <header class="top-bar">
     <div class="logo">
-      <div class="logo-icon">🏥</div>
-      <span>Atlas de Vulnerabilidade em Saúde</span>
+      <div class="logo-mark">IC</div>
+      <span>ICVS — Atlas de Vulnerabilidade em Saúde</span>
     </div>
     <nav>
       <a href="index.html">Mapa</a>
@@ -100,8 +100,8 @@
               <th>Indicador</th>
               <th>Valor Bruto</th>
               <th>Valor Suavizado</th>
-              <th>Percentil Nacional</th>
-              <th style="min-width:120px">Posição</th>
+              <th>Percentil</th>
+              <th style="min-width:120px">Posição Nacional</th>
             </tr>
           </thead>
           <tbody id="indicator-tbody"></tbody>
@@ -110,20 +110,14 @@
 
       <!-- Similar Municipalities -->
       <div class="similar-section">
-        <h3>Municípios Similares (mesmo cluster)</h3>
-        <div class="similar-grid" id="similar-grid">
-          <!-- populated via JS -->
-        </div>
+        <h3>Municípios Similares (mesma tipologia)</h3>
+        <div class="similar-grid" id="similar-grid"></div>
       </div>
 
       <!-- Actions -->
       <div class="action-bar">
-        <button class="btn btn-primary" onclick="window.print()">
-          📄 Exportar PDF
-        </button>
-        <button class="btn" onclick="window.location.href='index.html'">
-          🗺️ Ver no Mapa
-        </button>
+        <button class="btn btn-primary" onclick="window.print()">Exportar PDF</button>
+        <button class="btn" onclick="window.location.href='index.html'">Ver no Mapa</button>
       </div>
 
     </div>

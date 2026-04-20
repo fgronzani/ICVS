@@ -1,10 +1,11 @@
 /* =================================================================
-   Atlas de Vulnerabilidade em Saúde — Map Application
+   ICVS Atlas — Map Application
    Leaflet.js + TopoJSON + Canvas renderer for 5,570 municipalities
+   Professional light-theme choropleth
    ================================================================= */
 
-// -- Color scale: continuous interpolation across 5 quintile anchors --
-const QUINTIL_COLORS = ['#22c55e', '#86efac', '#fbbf24', '#f97316', '#ef4444'];
+// -- Color scale: sequential teal-to-red for vulnerability --
+const VULN_SCALE = ['#2a9d8f', '#8ab17d', '#e9c46a', '#e76f51', '#c1121f'];
 const QUINTIL_LABELS = ['Muito Baixa', 'Baixa', 'Moderada', 'Alta', 'Muito Alta'];
 const INDICATOR_LABELS = {
   icvs: 'ICVS — Índice Composto',
@@ -28,7 +29,6 @@ const state = {
 // -- Initialization --
 async function init() {
   try {
-    // Initialize Leaflet with Canvas renderer for performance
     state.map = L.map('map', {
       center: [-14.5, -51.0],
       zoom: 4,
@@ -39,9 +39,9 @@ async function init() {
       preferCanvas: true,
     });
 
-    // Dark tile layer
+    // Light neutral tile layer
     L.tileLayer(
-      'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png',
+      'https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png',
       {
         attribution: '© <a href="https://www.openstreetmap.org/copyright">OSM</a> © <a href="https://carto.com/">CARTO</a>',
         subdomains: 'abcd',
@@ -74,7 +74,7 @@ async function init() {
     renderMap();
     setupEventListeners();
 
-    // Hide loading overlay
+    // Hide loading
     const overlay = document.getElementById('loading');
     overlay.classList.add('hidden');
     setTimeout(() => overlay.remove(), 500);
@@ -88,13 +88,11 @@ async function init() {
   }
 }
 
-// -- Populate UI Controls --
+// -- Populate Controls --
 function populateControls() {
-  // Year
   const yearSelect = document.getElementById('year-select');
   yearSelect.innerHTML = `<option value="${state.year}">${state.year}</option>`;
 
-  // If series data has multiple years, populate them
   if (state.data.anos_disponiveis) {
     yearSelect.innerHTML = '';
     state.data.anos_disponiveis.forEach(y => {
@@ -106,7 +104,6 @@ function populateControls() {
     });
   }
 
-  // UF selector
   const ufs = [...new Set(Object.values(state.data.municipios).map(m => m.uf))].sort();
   const ufSelect = document.getElementById('uf-select');
   ufs.forEach(uf => {
@@ -117,21 +114,18 @@ function populateControls() {
   });
 }
 
-// -- Color interpolation --
+// -- Color Interpolation --
 function getColor(value) {
-  if (value === null || value === undefined || isNaN(value)) return '#333333';
+  if (value === null || value === undefined || isNaN(value)) return '#dee2e6';
 
-  // Clamp to 0-100
   const v = Math.max(0, Math.min(100, value));
-
-  // Map value to gradient position across 5 colors
-  const t = v / 100; // 0 to 1
-  const idx = t * (QUINTIL_COLORS.length - 1);
+  const t = v / 100;
+  const idx = t * (VULN_SCALE.length - 1);
   const lo = Math.floor(idx);
-  const hi = Math.min(lo + 1, QUINTIL_COLORS.length - 1);
+  const hi = Math.min(lo + 1, VULN_SCALE.length - 1);
   const f = idx - lo;
 
-  return interpolateColor(QUINTIL_COLORS[lo], QUINTIL_COLORS[hi], f);
+  return interpolateColor(VULN_SCALE[lo], VULN_SCALE[hi], f);
 }
 
 function interpolateColor(c1, c2, t) {
@@ -150,8 +144,8 @@ function interpolateColor(c1, c2, t) {
 }
 
 function getBadgeColor(quintil) {
-  if (quintil >= 1 && quintil <= 5) return QUINTIL_COLORS[quintil - 1];
-  return '#666666';
+  if (quintil >= 1 && quintil <= 5) return VULN_SCALE[quintil - 1];
+  return '#adb5bd';
 }
 
 function quintilLabel(q) {
@@ -164,9 +158,8 @@ function renderMap() {
     state.map.removeLayer(state.geolayer);
   }
 
-  // Determine the TopoJSON object key
   const objectKeys = Object.keys(state.geoData.objects);
-  const objectKey = objectKeys[0]; // Use first object
+  const objectKey = objectKeys[0];
   const geojson = topojson.feature(state.geoData, state.geoData.objects[objectKey]);
 
   state.geolayer = L.geoJSON(geojson, {
@@ -183,26 +176,25 @@ function styleFeature(feature) {
   const mun = state.data.municipios[code];
   const value = mun ? mun[state.indicator] : null;
 
-  // Dim features outside selected UF
+  // Dim non-selected UF municipalities
   if (state.uf && mun && mun.uf !== state.uf) {
     return {
-      fillColor: '#1a1a2e',
-      fillOpacity: 0.4,
+      fillColor: '#e9ecef',
+      fillOpacity: 0.6,
       weight: 0.2,
-      color: '#2a2a3e',
+      color: '#dee2e6',
     };
   }
 
   return {
     fillColor: getColor(value),
-    fillOpacity: 0.85,
-    weight: 0.3,
-    color: 'rgba(255,255,255,0.15)',
+    fillOpacity: 0.88,
+    weight: 0.4,
+    color: 'rgba(255,255,255,0.6)',
   };
 }
 
 function getFeatureCode(feature) {
-  // Handle different property names from IBGE API
   const props = feature.properties;
   const rawCode = props.codarea || props.CD_MUN || props.cod || props.id || '';
   return String(rawCode);
@@ -213,9 +205,15 @@ function bindFeatureEvents(feature, layer) {
   const mun = state.data.municipios[code];
 
   layer.on({
-    mouseover: e => showTooltip(e, mun, code),
+    mouseover: e => {
+      showTooltip(e, mun, code);
+      e.target.setStyle({ weight: 1.5, color: '#495057' });
+    },
     mousemove: e => moveTooltip(e),
-    mouseout: () => hideTooltip(),
+    mouseout: e => {
+      hideTooltip();
+      state.geolayer.resetStyle(e.target);
+    },
     click: () => {
       if (code) openMunicipality(code);
     },
@@ -240,7 +238,7 @@ function showTooltip(e, mun, code) {
       <span class="value" style="color:${getColor(icvs)}">${icvs?.toFixed(1) ?? 'N/D'}</span>
     </div>
     <div class="tooltip-row">
-      <span>Vulnerabilidade</span>
+      <span>Classificação</span>
       <span class="value">${quintilLabel(mun.icvs_quintil)}</span>
     </div>
     ${indicator !== 'icvs' ? `
@@ -250,8 +248,8 @@ function showTooltip(e, mun, code) {
     </div>
     ` : ''}
     <div class="tooltip-row">
-      <span>Cluster</span>
-      <span class="value">${mun.cluster ?? 'N/D'}</span>
+      <span>Pop.</span>
+      <span class="value">${mun.populacao ? mun.populacao.toLocaleString('pt-BR') : 'N/D'}</span>
     </div>
   `;
 
@@ -267,7 +265,6 @@ function positionTooltip(evt) {
   const x = evt.clientX + 16;
   const y = evt.clientY - 10;
 
-  // Keep tooltip within viewport
   const rect = tooltip.getBoundingClientRect();
   const maxX = window.innerWidth - rect.width - 20;
   const maxY = window.innerHeight - rect.height - 20;
@@ -295,8 +292,8 @@ function updateStatPanel() {
 
   const panel = document.getElementById('stats-panel');
   panel.innerHTML = `
-    <div class="stats-title">Top 10 mais vulneráveis${state.uf ? ` — ${state.uf}` : ''}</div>
-    ${entries.length === 0 ? '<p style="color: var(--text-muted); font-size: 12px;">Sem dados</p>' : ''}
+    <div class="stats-title">Municípios mais vulneráveis${state.uf ? ` — ${state.uf}` : ''}</div>
+    ${entries.length === 0 ? '<p style="color: var(--text-muted); font-size: 12px;">Sem dados disponíveis</p>' : ''}
     ${entries.map(([code, m], i) => `
       <div class="stat-row" onclick="openMunicipality('${code}')">
         <span class="rank">${i + 1}</span>
@@ -367,7 +364,6 @@ function setupEventListeners() {
     state.uf = e.target.value;
     renderMap();
 
-    // Zoom to UF if selected
     if (state.uf && state.geolayer) {
       const bounds = [];
       state.geolayer.eachLayer(layer => {
@@ -397,7 +393,6 @@ function setupEventListeners() {
     }, 200);
   });
 
-  // Mobile sidebar toggle
   const toggle = document.getElementById('sidebar-toggle');
   if (toggle) {
     toggle.addEventListener('click', () => {

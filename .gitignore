@@ -36,3 +36,4 @@ Thumbs.db
 
 # Node (for topojson CLI if used)
 node_modules/
+pipeline/ICVS

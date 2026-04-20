@@ -1,30 +1,39 @@
 /* =================================================================
-   Municipality Detail Page Logic
-   Loads per-municipality JSON and renders all detail panels
+   Municipality Detail Page — Professional light theme
    ================================================================= */
 
-const QUINTIL_COLORS = ['#22c55e', '#86efac', '#fbbf24', '#f97316', '#ef4444'];
+const VULN_SCALE = ['#2a9d8f', '#8ab17d', '#e9c46a', '#e76f51', '#c1121f'];
 const QUINTIL_LABELS = ['Muito Baixa', 'Baixa', 'Moderada', 'Alta', 'Muito Alta'];
 
 const INDICATOR_NAMES = {
-  tmi: 'Taxa de Mortalidade Infantil',
+  tmi: 'Taxa de Mortalidade Infantil (‰)',
   rmm: 'Razão de Mortalidade Materna',
-  apvp_taxa: 'Anos Pot. de Vida Perdidos (por 1.000)',
-  mort_prematura_dcnt: 'Mortalidade Prematura DCNT',
-  proporcao_obitos_evitaveis: 'Prop. Óbitos Evitáveis',
+  apvp_taxa: 'Anos Pot. Vida Perdidos (por 1.000 hab)',
+  mort_prematura_dcnt: 'Mortalidade Prematura DCNT (30–69a)',
+  proporcao_obitos_evitaveis: 'Proporção de Óbitos Evitáveis',
   cobertura_esf_inv: 'Déficit Cobertura ESF',
   cobertura_acs_inv: 'Déficit Cobertura ACS',
-  leitos_sus_inv: 'Déficit Leitos SUS',
-  medicos_inv: 'Déficit Médicos',
+  leitos_sus_inv: 'Leitos SUS por 1.000 hab',
+  medicos_inv: 'Médicos por 1.000 hab',
   distancia_hospital: 'Distância ao Hospital (km)',
-  taxa_icsap: 'Internações Sensíveis APS',
-  taxa_cesareas_sus: 'Taxa Cesáreas SUS',
+  taxa_icsap: 'Internações Sensíveis à APS (por 10.000)',
+  taxa_cesareas_sus: 'Taxa de Cesáreas SUS',
   prenatal_inadequado: 'Pré-natal Inadequado',
-  internacao_dm: 'Internações por Diabetes',
-  obitos_sem_assistencia: 'Óbitos sem Assistência',
+  internacao_dm: 'Internações Diabetes (por 10.000)',
+  obitos_sem_assistencia: 'Óbitos sem Assistência Médica',
 };
 
-let latestData = null; // icvs_latest.json cache for similar municipalities
+const INDICATOR_SUBINDEX = {
+  tmi: 'Desfechos', rmm: 'Desfechos', apvp_taxa: 'Desfechos',
+  mort_prematura_dcnt: 'Desfechos', proporcao_obitos_evitaveis: 'Desfechos',
+  cobertura_esf_inv: 'Acesso', cobertura_acs_inv: 'Acesso',
+  leitos_sus_inv: 'Acesso', medicos_inv: 'Acesso', distancia_hospital: 'Acesso',
+  taxa_icsap: 'Qualidade', taxa_cesareas_sus: 'Qualidade',
+  prenatal_inadequado: 'Qualidade', internacao_dm: 'Qualidade',
+  obitos_sem_assistencia: 'Qualidade',
+};
+
+let latestData = null;
 
 async function init() {
   const params = new URLSearchParams(window.location.search);
@@ -36,13 +45,12 @@ async function init() {
   }
 
   try {
-    // Load municipality data and latest data in parallel
     const [munRes, latestRes] = await Promise.all([
       fetch(`data/municipios/${code}.json`),
       fetch('data/icvs_latest.json'),
     ]);
 
-    if (!munRes.ok) throw new Error(`Dados não encontrados para o município ${code}`);
+    if (!munRes.ok) throw new Error(`Dados não encontrados para ${code}`);
     if (!latestRes.ok) throw new Error('Falha ao carregar dados nacionais');
 
     const munData = await munRes.json();
@@ -50,7 +58,6 @@ async function init() {
 
     renderPage(munData, code);
 
-    // Hide loading
     const overlay = document.getElementById('loading');
     overlay.classList.add('hidden');
     setTimeout(() => overlay.remove(), 500);
@@ -71,30 +78,28 @@ function renderPage(data, code) {
   const historico = data.icvs_historico || [];
   const indicadores = data.indicadores || [];
 
-  // Update page title
-  document.title = `${info.nome} — Atlas de Vulnerabilidade em Saúde`;
+  document.title = `${info.nome} — ICVS Atlas`;
 
   // Header
   document.getElementById('mun-name').textContent = info.nome;
-  document.getElementById('mun-uf').textContent = `📍 ${info.uf}`;
-  document.getElementById('mun-regiao').textContent = `🌍 ${info.regiao}`;
+  document.getElementById('mun-uf').textContent = info.uf;
+  document.getElementById('mun-regiao').textContent = info.regiao;
   document.getElementById('mun-pop').textContent =
-    `👥 ${(info.populacao || 0).toLocaleString('pt-BR')} hab.`;
+    `${(info.populacao || 0).toLocaleString('pt-BR')} habitantes`;
   document.getElementById('mun-cluster').textContent =
-    info.cluster != null ? `🏷️ Cluster ${info.cluster}` : '';
+    info.cluster != null ? `Tipologia ${info.cluster + 1}` : '';
 
-  // ICVS Hero
+  // ICVS Score
   const score = info.icvs;
   const quintil = info.icvs_quintil;
-  document.getElementById('icvs-score').textContent =
-    score != null ? score.toFixed(1) : 'N/D';
-  document.getElementById('icvs-score').style.color =
-    quintil ? QUINTIL_COLORS[quintil - 1] : '#94a3b8';
+  const scoreEl = document.getElementById('icvs-score');
+  scoreEl.textContent = score != null ? score.toFixed(1) : 'N/D';
+  scoreEl.style.color = quintil ? VULN_SCALE[quintil - 1] : '#868e96';
 
   const qlabel = document.getElementById('quintil-label');
   qlabel.textContent = QUINTIL_LABELS[quintil - 1] || 'N/D';
-  qlabel.style.background = quintil ? QUINTIL_COLORS[quintil - 1] + '22' : 'transparent';
-  qlabel.style.color = quintil ? QUINTIL_COLORS[quintil - 1] : '#94a3b8';
+  qlabel.style.background = quintil ? VULN_SCALE[quintil - 1] + '18' : 'transparent';
+  qlabel.style.color = quintil ? VULN_SCALE[quintil - 1] : '#868e96';
 
   // Metric cards
   renderMetricCard('card-icvs', 'trend-icvs', info.icvs, historico, 'icvs');
@@ -110,7 +115,6 @@ function renderPage(data, code) {
     );
   }
 
-  // Radar chart with national and cluster medians
   const nationalMedian = computeMedian(Object.values(latestData.municipios));
   const clusterMunicipios = Object.values(latestData.municipios)
     .filter(m => m.cluster === info.cluster);
@@ -141,7 +145,6 @@ function renderMetricCard(valueId, trendId, value, historico, key) {
       const diff = curr - prev;
       const trendEl = document.getElementById(trendId);
       const arrow = diff > 0 ? '↑' : diff < 0 ? '↓' : '→';
-      // For vulnerability, up is worse
       const cls = diff > 0.5 ? 'up' : diff < -0.5 ? 'down' : 'neutral';
       trendEl.className = `metric-trend ${cls}`;
       trendEl.textContent = `${arrow} ${Math.abs(diff).toFixed(1)} vs ano anterior`;
@@ -167,7 +170,6 @@ function computeMedian(municipios) {
 function renderIndicatorTable(indicadores, info) {
   const tbody = document.getElementById('indicator-tbody');
 
-  // Get the latest year indicators
   const latestYear = indicadores.length > 0
     ? Math.max(...indicadores.map(i => i.ano))
     : null;
@@ -175,21 +177,19 @@ function renderIndicatorTable(indicadores, info) {
   const latestIndicators = indicadores.filter(i => i.ano === latestYear);
 
   if (latestIndicators.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted)">Sem dados de indicadores</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted)">Sem dados de indicadores disponíveis</td></tr>';
     return;
   }
 
-  // Calculate percentiles from national data
-  const allMunicipios = Object.values(latestData.municipios);
-
   tbody.innerHTML = latestIndicators.map(ind => {
     const name = INDICATOR_NAMES[ind.indicador] || ind.indicador;
-    const valor = ind.valor != null ? ind.valor.toFixed(2) : 'N/D';
-    const suavizado = ind.valor_suavizado != null ? ind.valor_suavizado.toFixed(2) : '—';
+    const subindex = INDICATOR_SUBINDEX[ind.indicador] || '';
+    const valor = ind.valor != null ? formatIndicatorValue(ind.indicador, ind.valor) : 'N/D';
+    const suavizado = ind.valor_suavizado != null ? formatIndicatorValue(ind.indicador, ind.valor_suavizado) : '—';
 
-    // Calculate percentile (approximate from national data, using normalized value)
-    const percentile = ind.valor != null ? Math.round(ind.valor * 100) : null;
-    const pctColor = percentile != null ? getPercentileColor(percentile) : '#666';
+    // Approximate percentile from value (0-1 range normalized → 0-100)
+    const percentile = ind.valor != null ? Math.min(99, Math.max(1, Math.round(ind.valor * 100))) : null;
+    const pctColor = percentile != null ? getPercentileColor(percentile) : '#dee2e6';
 
     return `
       <tr>
@@ -207,18 +207,26 @@ function renderIndicatorTable(indicadores, info) {
   }).join('');
 }
 
+function formatIndicatorValue(indicator, value) {
+  if (value === null || value === undefined) return 'N/D';
+  // Proportions (0–1): show as percentage
+  if (['proporcao_obitos_evitaveis', 'taxa_cesareas_sus', 'prenatal_inadequado', 'obitos_sem_assistencia'].includes(indicator)) {
+    return (value * 100).toFixed(1) + '%';
+  }
+  return value.toFixed(2);
+}
+
 function getPercentileColor(p) {
-  if (p <= 20) return '#22c55e';
-  if (p <= 40) return '#86efac';
-  if (p <= 60) return '#fbbf24';
-  if (p <= 80) return '#f97316';
-  return '#ef4444';
+  if (p <= 20) return '#2a9d8f';
+  if (p <= 40) return '#8ab17d';
+  if (p <= 60) return '#e9c46a';
+  if (p <= 80) return '#e76f51';
+  return '#c1121f';
 }
 
 function renderSimilarMunicipalities(info, currentCode) {
   const grid = document.getElementById('similar-grid');
 
-  // Find municipalities in the same cluster, sorted by closest ICVS
   const similar = Object.entries(latestData.municipios)
     .filter(([code, m]) => code !== currentCode && m.cluster === info.cluster)
     .map(([code, m]) => ({
@@ -237,8 +245,8 @@ function renderSimilarMunicipalities(info, currentCode) {
   grid.innerHTML = similar.map(m => `
     <div class="similar-card" onclick="window.location.href='municipio.html?cod=${m.code}'">
       <div class="sim-name">${m.nome}</div>
-      <div class="sim-uf">${m.uf} — ${m.regiao}</div>
-      <div class="sim-icvs" style="color:${QUINTIL_COLORS[(m.icvs_quintil || 1) - 1]}">
+      <div class="sim-uf">${m.uf} — ${(m.populacao || 0).toLocaleString('pt-BR')} hab.</div>
+      <div class="sim-icvs" style="color:${VULN_SCALE[(m.icvs_quintil || 1) - 1]}">
         ${m.icvs?.toFixed(1) ?? 'N/D'}
       </div>
     </div>

@@ -3,117 +3,162 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Metodologia — Atlas de Vulnerabilidade em Saúde</title>
-  <meta name="description" content="Metodologia do ICVS — Índice Composto de Vulnerabilidade em Saúde: fontes de dados, indicadores, normalização, PCA e validação.">
+  <title>Metodologia — ICVS Atlas</title>
+  <meta name="description" content="Metodologia do Índice Composto de Vulnerabilidade em Saúde: fontes de dados, indicadores, suavização bayesiana, PCA e classificação.">
   <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
+
   <header class="top-bar">
     <div class="logo">
-      <div class="logo-icon">🏥</div>
-      <span>Atlas de Vulnerabilidade em Saúde</span>
+      <div class="logo-mark">IC</div>
+      <span>ICVS — Atlas de Vulnerabilidade em Saúde</span>
     </div>
     <nav>
       <a href="index.html">Mapa</a>
-      <a href="metodologia.html" class="active">Metodologia</a>
       <a href="sobre.html">Sobre</a>
     </nav>
   </header>
 
-  <div class="content-page">
+  <div class="content-layout">
     <div class="content-container">
-      <h1>Metodologia</h1>
-      <p>Descrição completa da construção do <strong>ICVS — Índice Composto de Vulnerabilidade em Saúde</strong>.</p>
+
+      <h1>Nota Metodológica</h1>
+      <p class="subtitle">Descrição dos procedimentos de coleta, processamento e construção do Índice Composto de Vulnerabilidade em Saúde (ICVS).</p>
 
       <h2>1. Fontes de Dados</h2>
-      <p>O ICVS utiliza exclusivamente bases de dados públicas brasileiras:</p>
+      <p>Todos os dados utilizados são de acesso público, provenientes dos sistemas de informação do Ministério da Saúde (DATASUS) e do Instituto Brasileiro de Geografia e Estatística (IBGE).</p>
+
       <table>
         <thead>
-          <tr><th>Sistema</th><th>Órgão</th><th>Dados</th><th>Acesso</th></tr>
+          <tr>
+            <th>Sistema</th>
+            <th>Fonte</th>
+            <th>Conteúdo</th>
+          </tr>
         </thead>
         <tbody>
-          <tr><td>SIM</td><td>DATASUS</td><td>Mortalidade</td><td>PySUS / FTP DATASUS</td></tr>
-          <tr><td>SINASC</td><td>DATASUS</td><td>Nascidos vivos</td><td>PySUS / FTP DATASUS</td></tr>
-          <tr><td>SIH</td><td>DATASUS</td><td>Internações hospitalares</td><td>PySUS / FTP DATASUS</td></tr>
-          <tr><td>CNES</td><td>DATASUS</td><td>Estabelecimentos de saúde</td><td>PySUS / FTP DATASUS</td></tr>
-          <tr><td>e-Gestor APS</td><td>Ministério da Saúde</td><td>Cobertura ESF/ACS</td><td>CSV público</td></tr>
-          <tr><td>IBGE</td><td>IBGE</td><td>População, área, malha</td><td>API IBGE</td></tr>
+          <tr>
+            <td>SIM</td>
+            <td>DATASUS / PySUS</td>
+            <td>Declarações de Óbito — mortalidade por causa, idade, município</td>
+          </tr>
+          <tr>
+            <td>SINASC</td>
+            <td>DATASUS / PySUS</td>
+            <td>Nascidos vivos — partos, pré-natal, cesáreas</td>
+          </tr>
+          <tr>
+            <td>SIH/SUS</td>
+            <td>DATASUS / PySUS</td>
+            <td>Autorizações de Internação Hospitalar — diagnósticos, procedimentos</td>
+          </tr>
+          <tr>
+            <td>CNES</td>
+            <td>DATASUS / PySUS</td>
+            <td>Estabelecimentos — leitos SUS, profissionais de saúde</td>
+          </tr>
+          <tr>
+            <td>IBGE</td>
+            <td>API SIDRA</td>
+            <td>Estimativas populacionais e metadados municipais</td>
+          </tr>
         </tbody>
       </table>
 
       <h2>2. Indicadores</h2>
-      <p>O ICVS é composto por <strong>15 indicadores</strong> agrupados em 3 sub-índices:</p>
+      <p>O ICVS é composto por 15 indicadores distribuídos em três sub-índices:</p>
 
-      <h3>Sub-índice A: Desfechos em Saúde (peso 40%)</h3>
+      <h3>Sub-índice A — Desfechos em Saúde (peso: 40%)</h3>
       <ul>
-        <li><strong>TMI</strong> — Taxa de Mortalidade Infantil: óbitos &lt;1 ano / nascidos vivos × 1.000</li>
-        <li><strong>RMM</strong> — Razão de Mortalidade Materna: óbitos maternos / NV × 100.000</li>
-        <li><strong>APVP</strong> — Anos Potenciais de Vida Perdidos: Σ(75 − idade) para óbitos &lt;75</li>
-        <li><strong>Mortalidade prematura por DCNT</strong>: óbitos CID I,C,E,J (30-69) / pop 30-69 × 100.000</li>
-        <li><strong>Proporção de óbitos evitáveis</strong>: óbitos por causas evitáveis / total de óbitos</li>
+        <li><strong>Taxa de Mortalidade Infantil (TMI)</strong> — óbitos &lt;1 ano / nascidos vivos × 1.000</li>
+        <li><strong>Razão de Mortalidade Materna (RMM)</strong> — óbitos maternos (CID O00–O99) / nascidos vivos × 100.000</li>
+        <li><strong>Anos Potenciais de Vida Perdidos (APVP)</strong> — soma de (75 − idade ao óbito) / população × 1.000</li>
+        <li><strong>Mortalidade prematura por DCNT</strong> — óbitos por doenças crônicas (30–69 anos) / pop. 30–69 × 100.000</li>
+        <li><strong>Proporção de óbitos evitáveis</strong> — óbitos por causas evitáveis (Malta et al., 2007) / total de óbitos</li>
       </ul>
 
-      <h3>Sub-índice B: Acesso e Capacidade (peso 35%)</h3>
+      <h3>Sub-índice B — Acesso e Capacidade (peso: 35%)</h3>
       <ul>
-        <li><strong>Cobertura ESF</strong> — percentual da população coberta por Equipe de Saúde da Família</li>
-        <li><strong>Cobertura ACS</strong> — percentual coberto por Agentes Comunitários de Saúde</li>
-        <li><strong>Leitos SUS por 1.000 hab</strong></li>
-        <li><strong>Médicos por 1.000 hab</strong></li>
-        <li><strong>Distância ao hospital mais próximo</strong> (km)</li>
+        <li><strong>Leitos SUS por 1.000 habitantes</strong> — total de leitos SUS (CNES-LT) / população × 1.000</li>
+        <li><strong>Médicos por 1.000 habitantes</strong> — profissionais CBO 225 (CNES-PF) / população × 1.000</li>
+        <li><strong>Cobertura ESF</strong> — proporção de população coberta pela Estratégia Saúde da Família (quando disponível)</li>
+        <li><strong>Cobertura ACS</strong> — proporção de população coberta por Agentes Comunitários de Saúde</li>
+        <li><strong>Distância ao hospital</strong> — indicador geoespacial (em desenvolvimento)</li>
       </ul>
 
-      <h3>Sub-índice C: Qualidade da Atenção (peso 25%)</h3>
+      <h3>Sub-índice C — Qualidade da Atenção (peso: 25%)</h3>
       <ul>
-        <li><strong>Taxa de ICSAP</strong> — Internações por Condições Sensíveis à Atenção Primária</li>
-        <li><strong>Taxa de cesáreas SUS</strong> (above 50% is concerning)</li>
-        <li><strong>Proporção de pré-natal adequado</strong> (≥6 consultas)</li>
-        <li><strong>Internações por complicações de diabetes</strong></li>
-        <li><strong>Óbitos sem assistência médica</strong></li>
+        <li><strong>Internações por Causas Sensíveis à APS (ICSAP)</strong> — internações por condições da Portaria nº 221/2008 / pop. × 10.000</li>
+        <li><strong>Taxa de cesáreas SUS</strong> — partos cesários / total de nascidos vivos</li>
+        <li><strong>Pré-natal inadequado</strong> — gestantes com menos de 7 consultas pré-natais / nascidos vivos</li>
+        <li><strong>Internações por complicações de diabetes</strong> — internações por DM (CID E10–E14) / pop. × 10.000</li>
+        <li><strong>Óbitos sem assistência médica</strong> — óbitos com assistência=não ou ignorada / total de óbitos</li>
       </ul>
 
-      <h2>3. Suavização Bayesiana</h2>
-      <p>Municípios com menos de 10.000 habitantes possuem taxas instáveis — um único óbito adicional pode triplicar a TMI. Utilizamos <strong>suavização bayesiana empírica (Empirical Bayes)</strong> para estabilizar essas taxas:</p>
-      <div class="formula">
-        λ_suavizado = (eventos + α) / (população + β)<br><br>
-        onde α = μ²/σ² e β = μ/σ² são estimados a partir de municípios com pop &gt; 50.000
+      <h2>3. Processamento Estatístico</h2>
+
+      <h3>3.1 Suavização Bayesiana Empírica</h3>
+      <p>Municípios com população inferior a 10.000 habitantes estão sujeitos a alta variância estocástica nas taxas. Para mitigar este efeito, aplicamos suavização bayesiana empírica (modelo Gamma-Poisson), que contrai as estimativas em direção à média regional da UF.</p>
+      <div class="formula-block">
+        θ̂ᵢ = wᵢ · yᵢ + (1 − wᵢ) · μ_UF
+        <br>
+        wᵢ = nᵢ / (nᵢ + φ)
       </div>
-      <p>A taxa suavizada "encolhe" (shrinks) valores extremos de municípios pequenos em direção à média regional, sem alterar significativamente os valores de municípios grandes.</p>
+      <p>Onde <em>yᵢ</em> é a taxa observada, <em>μ_UF</em> a média da UF, <em>nᵢ</em> a população, e <em>φ</em> o parâmetro de dispersão estimado pelo método dos momentos.</p>
 
-      <h2>4. Normalização</h2>
-      <p>Todos os indicadores são normalizados para o intervalo [0, 1] utilizando normalização min-max baseada nos percentis P5 e P95, garantindo robustez contra outliers extremos:</p>
-      <div class="formula">
-        x_norm = (x - P5) / (P95 - P5), truncado em [0, 1]<br><br>
-        Para indicadores onde "maior é melhor" (ex: cobertura ESF): x_norm = 1 - x_norm
+      <h3>3.2 Normalização</h3>
+      <p>Após suavização, cada indicador é normalizado para o intervalo [0, 1] usando min-max com truncamento nos percentis P5 e P95, reduzindo a influência de valores extremos (outliers).</p>
+      <div class="formula-block">
+        x_norm = (x − P5) / (P95 − P5), truncado em [0, 1]
       </div>
 
-      <h2>5. Cálculo do ICVS via PCA</h2>
-      <p>O ICVS utiliza <strong>Análise de Componentes Principais (PCA)</strong> para derivar pesos dos indicadores de forma data-driven, sem referência a índices externos como IDHM:</p>
-      <ol>
-        <li>Padronizar todos os indicadores (z-score)</li>
-        <li>Executar PCA e extrair os loadings do primeiro componente principal (PC1)</li>
-        <li>PC1 deve explicar &gt;25% da variância total (fator geral de vulnerabilidade)</li>
-        <li>Pesos = loadings normalizados (somam 1)</li>
-        <li>ICVS = combinação linear ponderada, escalada para [0, 100]</li>
-      </ol>
-      <p><strong>O PCA é executado separadamente para cada sub-índice</strong>, e os 3 sub-índices são combinados com pesos conceituais (40/35/25).</p>
+      <h3>3.3 Análise de Componentes Principais (PCA)</h3>
+      <p>Para cada sub-índice, extraímos o primeiro componente principal (PC1) dos indicadores normalizados. Se o PC1 explicar ao menos 25% da variância, utilizamos os <em>loadings</em> absolutos normalizados como pesos dos indicadores. Caso contrário, aplicamos pesos iguais.</p>
+      <p>Esta abordagem data-driven permite que os pesos reflitam a estrutura de correlação real dos dados, em vez de escolhas arbitrárias.</p>
 
-      <h2>6. Classificação e Clustering</h2>
-      <p>Os municípios são classificados em 5 quintis de vulnerabilidade (Muito Baixa a Muito Alta) e agrupados em <strong>6 tipologias</strong> via K-Means, permitindo comparação entre municípios similares.</p>
+      <h3>3.4 Composição do ICVS</h3>
+      <div class="formula-block">
+        ICVS = 0,40 × Sub_Desfechos + 0,35 × Sub_Acesso + 0,25 × Sub_Qualidade
+      </div>
 
-      <h2>7. Validação</h2>
-      <h3>Validação Externa</h3>
-      <p>Correlação de Spearman com IDHM, IFDM e esperança de vida. Esperamos correlação <strong>moderada (0.5–0.7)</strong> — muito alta indicaria que o ICVS é apenas proxy de riqueza; muito baixa indicaria desconexão dos indicadores.</p>
+      <h3>3.5 Classificação</h3>
+      <p>Os municípios são classificados em cinco quintis baseados em rank percentual:</p>
+      <table>
+        <thead>
+          <tr><th>Quintil</th><th>Classificação</th><th>Percentil ICVS</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td>Muito Baixa</td><td>0–20%</td></tr>
+          <tr><td>2</td><td>Baixa</td><td>20–40%</td></tr>
+          <tr><td>3</td><td>Moderada</td><td>40–60%</td></tr>
+          <tr><td>4</td><td>Alta</td><td>60–80%</td></tr>
+          <tr><td>5</td><td>Muito Alta</td><td>80–100%</td></tr>
+        </tbody>
+      </table>
 
-      <h3>Validação Temporal</h3>
-      <p>Verificamos se o ICVS do ano T prediz a taxa de ICSAP do ano T+2, sustentando o índice como <strong>preditor de desfecho</strong>, não apenas descritor.</p>
+      <h3>3.6 Tipologia Municipal (Clustering)</h3>
+      <p>Utilizamos K-Means (k=6) com features de população (log), sub-índices e região para identificar tipologias municipais. Os clusters são ordenados pelo ICVS médio crescente, permitindo comparações entre municípios estruturalmente similares.</p>
 
-      <h2>8. Limitações</h2>
+      <h2>4. Limitações</h2>
       <ul>
-        <li><strong>Subnotificação conhecida</strong> no Norte/Nordeste (SIM e SINASC), sinalizada quando taxa de óbitos mal definidos (CID R00–R99) ultrapassa 15%</li>
-        <li><strong>Geocódigos IBGE</strong> — diferença entre 6 e 7 dígitos requer mapeamento explícito</li>
-        <li><strong>PC1 não interpretável</strong> — se PC1 explica &lt;25% da variância, os 3 sub-índices são reportados separadamente</li>
-        <li><strong>Dados temporais</strong> — competência mensal do CNES vs. anual dos demais sistemas</li>
+        <li>A qualidade dos dados depende da cobertura e completude dos sistemas de informação (SIM, SINASC, SIH).</li>
+        <li>Indicadores de cobertura ESF/ACS e distância ao hospital aguardam integração com fontes complementares.</li>
+        <li>A suavização bayesiana, embora melhore a estabilidade, pode mascarar variações reais em municípios muito pequenos.</li>
+        <li>O ICVS captura uma dimensão composta de vulnerabilidade, mas não substitui análises específicas por condição de saúde.</li>
       </ul>
+
+      <h2>5. Referências</h2>
+      <ul>
+        <li>Malta, D. C. et al. (2007). Lista de causas de mortes evitáveis por intervenções do SUS. <em>Epidemiol. Serv. Saúde</em>, 16(4), 233–244.</li>
+        <li>Portaria SAS/MS nº 221, de 17 de abril de 2008 — Lista Brasileira de Internações por Condições Sensíveis à Atenção Primária.</li>
+        <li>Assunção, R. M. et al. (2005). Mapas de taxas epidemiológicas: uma abordagem Bayesiana. <em>Cadernos de Saúde Pública</em>, 21(6), 1942-1950.</li>
+      </ul>
+
+      <div class="page-footer">
+        ICVS — Índice Composto de Vulnerabilidade em Saúde · Dados: DATASUS/IBGE · Atualização: 2021
+      </div>
+
     </div>
   </div>
 </body>

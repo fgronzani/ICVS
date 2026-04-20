@@ -3,30 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Atlas de Vulnerabilidade em Saúde — Brasil</title>
-  <meta name="description" content="ICVS — Índice Composto de Vulnerabilidade em Saúde. Atlas interativo dos 5.570 municípios brasileiros com indicadores de mortalidade, acesso e qualidade da atenção em saúde.">
+  <title>ICVS — Índice Composto de Vulnerabilidade em Saúde</title>
+  <meta name="description" content="Atlas interativo de vulnerabilidade em saúde dos 5.570 municípios brasileiros. Indicadores de mortalidade, acesso e qualidade da atenção baseados em dados públicos do DATASUS e IBGE.">
 
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
         crossorigin="anonymous"/>
 
-  <!-- App CSS -->
   <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
 
-  <!-- Loading Overlay -->
+  <!-- Loading -->
   <div class="loading-overlay" id="loading">
     <div class="loading-spinner"></div>
-    <div class="loading-text">Carregando atlas...</div>
+    <div class="loading-text">Carregando dados...</div>
   </div>
 
   <!-- Header -->
   <header class="top-bar">
     <div class="logo">
-      <div class="logo-icon">🏥</div>
-      <span>Atlas de Vulnerabilidade em Saúde</span>
+      <div class="logo-mark">IC</div>
+      <span>ICVS — Atlas de Vulnerabilidade em Saúde</span>
     </div>
     <nav>
       <a href="metodologia.html">Metodologia</a>
@@ -46,7 +45,7 @@
         <div class="search-wrapper">
           <input type="text"
                  id="search-input"
-                 placeholder="Digite o nome..."
+                 placeholder="Ex: Florianópolis"
                  autocomplete="off">
           <div class="search-results" id="search-results"></div>
         </div>
@@ -63,9 +62,9 @@
         <label for="indicator-select">Indicador</label>
         <select id="indicator-select">
           <option value="icvs">ICVS — Índice Composto</option>
-          <option value="sub_desfechos">Sub-índice: Desfechos</option>
-          <option value="sub_acesso">Sub-índice: Acesso</option>
-          <option value="sub_qualidade">Sub-índice: Qualidade</option>
+          <option value="sub_desfechos">Sub-índice: Desfechos em Saúde</option>
+          <option value="sub_acesso">Sub-índice: Acesso e Capacidade</option>
+          <option value="sub_qualidade">Sub-índice: Qualidade da Atenção</option>
         </select>
       </div>
 
@@ -91,7 +90,7 @@
 
       <!-- Legend -->
       <div class="legend" id="legend">
-        <div class="legend-title">Vulnerabilidade</div>
+        <div class="legend-title">Nível de vulnerabilidade</div>
         <div class="legend-gradient"></div>
         <div class="legend-labels">
           <span>Muito Baixa</span>
@@ -104,8 +103,7 @@
 
       <!-- Top Municipalities -->
       <div class="stats-panel" id="stats-panel">
-        <div class="stats-title">Top 10 mais vulneráveis</div>
-        <!-- populated via JS -->
+        <div class="stats-title">Municípios mais vulneráveis</div>
       </div>
     </aside>
 
