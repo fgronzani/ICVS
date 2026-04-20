@@ -53,8 +53,16 @@ def export_latest_json(
     """
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    # Merge metadata
-    merged = df.merge(metadata, on="codmun", how="left")
+    # Merge metadata (drop columns from df that will come from metadata)
+    df_clean = df.drop(columns=[c for c in ["uf", "regiao", "nome"] if c in df.columns], errors="ignore")
+    merged = df_clean.merge(metadata, on="codmun", how="left")
+
+    # Fallback for UF/regiao if metadata merge failed
+    if "uf" not in merged.columns or merged["uf"].isna().all():
+        from config import UF_CODES, UF_REGION
+        code_to_uf = {v: k for k, v in UF_CODES.items()}
+        merged["uf"] = merged["codmun"].astype(str).str[:2].astype(int).map(code_to_uf)
+        merged["regiao"] = merged["uf"].map(UF_REGION)
 
     municipios = {}
     for _, row in merged.iterrows():
@@ -108,8 +116,9 @@ def export_municipality_jsons(
     latest_year = df_all_years["ano"].max()
     latest = df_all_years[df_all_years["ano"] == latest_year]
 
-    # Merge metadata with latest year
-    latest_merged = latest.merge(metadata, on="codmun", how="left")
+    # Merge metadata with latest year (drop columns that come from metadata)
+    latest_clean = latest.drop(columns=[c for c in ["uf", "regiao", "nome"] if c in latest.columns], errors="ignore")
+    latest_merged = latest_clean.merge(metadata, on="codmun", how="left")
 
     count = 0
     for codmun in df_all_years["codmun"].unique():

@@ -135,11 +135,23 @@ def compute_all_indicators(
     # --- Quality flag ---
     df["flag_mal_definidos"] = df["obitos_mal_definidos"] / obitos_total
 
-    # Select only indicator columns
+    # Select indicator columns + counts needed downstream
     from config import ALL_INDICATORS
-    indicator_cols = ["codmun", "ano", "populacao"] + ALL_INDICATORS + ["flag_mal_definidos"]
-    available = [c for c in indicator_cols if c in df.columns]
+    count_keep = [
+        "obitos_infantis", "obitos_maternos", "apvp",
+        "obitos_dcnt_30_69", "obitos_evitaveis", "obitos_sem_assist",
+        "nascidos_vivos", "internacoes_icsap", "internacoes_dm",
+        "obitos_total", "obitos_mal_definidos",
+    ]
+    indicator_cols = (
+        ["codmun", "ano", "populacao"]
+        + ALL_INDICATORS
+        + ["flag_mal_definidos"]
+        + count_keep
+    )
+    available = list(dict.fromkeys(c for c in indicator_cols if c in df.columns))
 
     result = df[available].copy()
-    logger.info(f"Indicadores calculados: {len(result)} registros, {len(available) - 3} indicadores")
+    logger.info(f"Indicadores calculados: {len(result)} registros, "
+                f"{sum(1 for c in ALL_INDICATORS if c in available)} indicadores")
     return result
